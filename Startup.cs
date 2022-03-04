@@ -2,11 +2,13 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using PhonebookAPI.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +28,15 @@ namespace PhonebookAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var server = Configuration["Server"] ?? "";
+            var port = Configuration["Port"] ?? "";
+            var user = Configuration["User"] ?? "";
+            var password = Configuration["Password"] ?? "";
+            var database = Configuration["Database"] ?? "";
 
+            var connectionString = $"Server={server}, {port}; Initial Catalog={database}; User ID={user}; Password={password}";
+ 
+            services.AddDbContext<PhonebookContext>(options => options.UseSqlServer(connectionString));
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
