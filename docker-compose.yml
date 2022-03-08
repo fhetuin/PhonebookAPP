@@ -1,0 +1,23 @@
+﻿version: '3.8'
+services:
+  ms-sql-server:
+    image: mcr.microsoft.com/mssql/server:2017-latest-ubuntu
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "Wemanity2021"
+      MSSQL_PID: Express
+    ports:
+      - "1433:1433"
+  phonebook-api:
+    build: 
+      context: .
+      args:
+        buildnbinfo: 1
+    environment:
+      Server: "ms-sql-server"
+      Port: "1433"
+      User: "SA"
+      Password: "Wemanity2021"
+      Database: "Phonebook"
+    ports: 
+      - "8080:80"
