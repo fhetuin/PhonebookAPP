@@ -9,6 +9,8 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using PhonebookAPI.Model;
+using PhonebookAPI.Repo;
+using PhonebookAPI.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,8 +37,9 @@ namespace PhonebookAPI
             var database = Configuration["Database"] ?? "";
 
             var connectionString = $"Server={server}, {port}; Initial Catalog={database}; User ID={user}; Password={password}";
- 
+
             services.AddDbContext<PhonebookContext>(options => options.UseSqlServer(connectionString));
+            services.AddTransient<IContact, ContactRepo>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -47,12 +50,14 @@ namespace PhonebookAPI
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            DatabaseManagementService.MigrationInitialisation(app);
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "PhonebookAPI v1"));
+                // app.UseSwagger();
+                // app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "PhonebookAPI v1"));
             }
+
 
             app.UseHttpsRedirection();
 

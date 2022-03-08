@@ -2,8 +2,10 @@
 
 namespace PhonebookAPI.Model
 {
-    public partial class PhonebookContext : DbContext
+    public class PhonebookContext : DbContext
     {
+        public DbSet<Contact> Contacts { get; set; }
+
         public PhonebookContext()
         {
         }
@@ -13,6 +15,11 @@ namespace PhonebookAPI.Model
         {
         }
 
-        public virtual DbSet<Contact> Contacts { get; set; }
+
+
+
+
+
+
     }
 }
