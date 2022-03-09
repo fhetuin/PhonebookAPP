@@ -8,7 +8,8 @@ EXPOSE 443
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
 COPY ["PhonebookAPI.csproj", "."]
-RUN dotnet restore "./PhonebookAPI.csproj"
+RUN dotnet restore "PhonebookAPI.csproj"
+
 COPY . .
 WORKDIR "/src/."
 RUN dotnet build "PhonebookAPI.csproj" -c Release -o /app/build

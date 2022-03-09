@@ -1,3 +1,5 @@
+go to cd phonebook.api
+
 docker build -t phonebook .
 
 docker run -p 8080:80 phonebook

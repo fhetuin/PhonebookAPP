@@ -33,6 +33,9 @@
       "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
       "publishAllPorts": true,
       "useSSL": true
+    },
+    "Docker Compose": {
+      "commandName": "Executable"
     }
   }
 }
