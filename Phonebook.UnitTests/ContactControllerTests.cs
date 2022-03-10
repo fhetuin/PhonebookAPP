@@ -7,10 +7,13 @@ using PhonebookAPI.Controllers;
 using PhonebookAPI.DTO;
 using PhonebookAPI.Services;
 using System;
+using System.Collections;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
+using Model = PhonebookAPI.Model;
+using DTO = PhonebookAPI.DTO;
 
 namespace Phonebook.UnitTests
 {
@@ -30,6 +33,8 @@ namespace Phonebook.UnitTests
         {
             this.output = output;
         }
+
+        //Random Creation
         private CreateContact CreateRandomContact()
         {
             return new()
@@ -41,7 +46,64 @@ namespace Phonebook.UnitTests
             };
         }
 
+        private Model.Contact RandomContact()
+        {
+            return new()
+            {
+                Id = rand.Next(1000),
+                FirstName = Guid.NewGuid().ToString(),
+                Name = Guid.NewGuid().ToString(),
+                Number = xeger.Generate()
+            };
+        }
 
+
+
+        //Tests
+
+        [Fact]
+        public async Task UpdateContactAsync_WithExistingContact_ReturnsNoContent()
+        {
+            // Arrange
+            Model.Contact existingContact = RandomContact();
+            repositoryStub.Setup(repo => repo.GetContactAsync(It.IsAny<int>()))
+                .ReturnsAsync(existingContact);
+
+            var contactId = existingContact.Id;
+            var contactToUpdate = new UpdateContact()
+            {
+                Name = Guid.NewGuid().ToString(),
+                FirstName = Guid.NewGuid().ToString(),
+                Number = xeger.Generate()
+            };
+
+            var controller = new ContactController(repositoryStub.Object, loggerStub.Object);
+
+            //Act
+            var result = await controller.UpdateContactAsync(contactId, contactToUpdate);
+            //Assert
+            result.Should().BeOfType<NoContentResult>();
+        }
+
+        [Fact]
+        public async Task GetContacts_WithExistingContacts_ReturnsAllContacts()
+        {
+            // Arrange
+            var expectedContacts = new[] { RandomContact(), RandomContact(), RandomContact() };
+            repositoryStub.Setup(repo => repo.GetContactsAsync())
+            .ReturnsAsync(expectedContacts);
+            var controller = new ContactController(repositoryStub.Object, loggerStub.Object);
+
+            //Act
+            var actionResult = await controller.GetAsync();
+            var result = (actionResult.Result as OkObjectResult);
+            var actualContacts = result.Value;
+            //Assert
+            actualContacts.Should().BeEquivalentTo(
+           expectedContacts,
+           options => options.ComparingByMembers<Contact>()
+            );
+        }
 
         [Fact]
         public async Task CreateContactAsync_WithItemToCreate_ReturnsCreatedItem()
