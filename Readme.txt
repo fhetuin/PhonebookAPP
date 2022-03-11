@@ -1,4 +1,4 @@
-go to cd phonebook.api
+go to phonebook.api
 
 docker build -t phonebook .
 

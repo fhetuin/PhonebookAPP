@@ -2,23 +2,19 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using PhonebookAPI.Model;
 using PhonebookAPI.Repo;
 using PhonebookAPI.Services;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Mime;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace PhonebookAPI
 {
@@ -39,12 +35,23 @@ namespace PhonebookAPI
             var user = Configuration["User"] ?? "";
             var password = Configuration["Password"] ?? "";
             var database = Configuration["Database"] ?? "";
+#if DEBUG
 
+
+            var connectionString = $"Server=localhost\\MSSQLSERVER01; Initial Catalog={database}; User ID=spheretech; Password=EasyRD/1V3";
+#else
             var connectionString = $"Server={server}, {port}; Initial Catalog={database}; User ID={user}; Password={password}";
-
+#endif
             services.AddDbContext<PhonebookContext>(options => options.UseSqlServer(connectionString));
             services.AddTransient<IContact, ContactRepo>();
-            services.AddControllers(options => options.SuppressAsyncSuffixInActionNames = false);
+            services.AddControllersWithViews(options => options.SuppressAsyncSuffixInActionNames = false);
+
+
+            // In production, the React files will be served from this directory
+            services.AddSpaStaticFiles(configuration =>
+            {
+                configuration.RootPath = "ClientApp/build";
+            });
             services.AddHealthChecks().AddSqlServer(connectionString, name: "sqlserver", timeout: TimeSpan.FromSeconds(3));
             services.AddSwaggerGen(c =>
             {
@@ -59,16 +66,38 @@ namespace PhonebookAPI
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                // app.UseSwagger();
-                // app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "PhonebookAPI v1"));
+            }
+            else
+            {
+                app.UseExceptionHandler("/Error");
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                app.UseHsts();
             }
 
-
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
+
 
             app.UseRouting();
 
             app.UseAuthorization();
+
+
+            app.UseSpaStaticFiles();
+            app.UseSpa(spa =>
+             {
+                 spa.Options.SourcePath = "ClientApp";
+                 if (env.IsDevelopment())
+                 {
+                     spa.Options.StartupTimeout = TimeSpan.FromSeconds(120);
+                     spa.UseProxyToSpaDevelopmentServer("http://localhost:8000");
+                 }
+                 else
+                 {
+
+                 }
+
+             });
 
             app.UseEndpoints(endpoints =>
             {
