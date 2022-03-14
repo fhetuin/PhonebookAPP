@@ -8,7 +8,7 @@
 
 open your browser and go to http://localhost:8080/
 
-if you want to develop, you need to install sql server
+if you want to develop, you need to install sql server and change the connection string in phonebook.api/startup.cs
 
 1. clone the repo
 

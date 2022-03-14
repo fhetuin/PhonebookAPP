@@ -45,7 +45,7 @@ namespace PhonebookAPI
 #if DEBUG
 
 
-            var connectionString = $"Server=localhost\\MSSQLSERVER01; Initial Catalog={database}; User ID=spheretech; Password=EasyRD/1V3";
+            var connectionString = $"Server=localhost\\MSSQLSERVER01; Initial Catalog={database}";
 #else
             var connectionString = $"Server={server}, {port}; Initial Catalog={database}; User ID={user}; Password={password}";
 #endif
