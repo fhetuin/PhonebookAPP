@@ -1,8 +1,10 @@
-1. you need docker desktop
+1. you need docker desktop https://www.docker.com/products/docker-desktop 
 
-2. open new terminal and go to phonebook.api
+2. clone the repo
 
-3. run docker-compose up --build
+3. open new terminal and go to phonebook.api
+
+4. run docker-compose up --build
 
 open your browser and go to http://localhost:8080/
 
