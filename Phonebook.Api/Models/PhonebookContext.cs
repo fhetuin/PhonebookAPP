@@ -8,14 +8,13 @@ namespace PhonebookAPI.Model
 
         public PhonebookContext()
         {
+
         }
 
         public PhonebookContext(DbContextOptions<PhonebookContext> options)
             : base(options)
         {
         }
-
-
 
 
 
