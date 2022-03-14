@@ -30,6 +30,13 @@ namespace PhonebookAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //Enable CORS
+            services.AddCors(c =>
+            {
+                c.AddPolicy("AllowOrigin", options => options.AllowAnyOrigin().AllowAnyMethod()
+                 .AllowAnyHeader());
+            });
+
             var server = Configuration["Server"] ?? "";
             var port = Configuration["Port"] ?? "";
             var user = Configuration["User"] ?? "";
@@ -44,7 +51,13 @@ namespace PhonebookAPI
 #endif
             services.AddDbContext<PhonebookContext>(options => options.UseSqlServer(connectionString));
             services.AddTransient<IContact, ContactRepo>();
-            services.AddControllersWithViews(options => options.SuppressAsyncSuffixInActionNames = false);
+
+            services.AddControllersWithViews(options => options.SuppressAsyncSuffixInActionNames = false)
+    .AddNewtonsoftJson(options =>
+    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft
+    .Json.ReferenceLoopHandling.Ignore);
+
+            services.AddControllers();
 
 
             // In production, the React files will be served from this directory
@@ -63,6 +76,9 @@ namespace PhonebookAPI
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             DatabaseManagementService.MigrationInitialisation(app);
+
+            app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -84,20 +100,6 @@ namespace PhonebookAPI
 
 
             app.UseSpaStaticFiles();
-            app.UseSpa(spa =>
-             {
-                 spa.Options.SourcePath = "ClientApp";
-                 if (env.IsDevelopment())
-                 {
-                     spa.Options.StartupTimeout = TimeSpan.FromSeconds(120);
-                     spa.UseProxyToSpaDevelopmentServer("http://localhost:8000");
-                 }
-                 else
-                 {
-
-                 }
-
-             });
 
             app.UseEndpoints(endpoints =>
             {
@@ -132,6 +134,22 @@ namespace PhonebookAPI
 
 
             });
+
+            app.UseSpa(spa =>
+             {
+                 spa.Options.SourcePath = "ClientApp";
+                 if (env.IsDevelopment())
+                 {
+                     spa.Options.StartupTimeout = TimeSpan.FromSeconds(120);
+                     spa.UseProxyToSpaDevelopmentServer("http://localhost:8000");
+                 }
+                 else
+                 {
+
+                 }
+
+             });
+
         }
     }
 }

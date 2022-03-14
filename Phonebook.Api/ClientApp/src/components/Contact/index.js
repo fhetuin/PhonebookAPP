@@ -4,11 +4,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllContacts, selectedContact } from "../../state/contact";
 
 
-const ContactComponent = () => {
+const ContactsComponent = () => {
   const contacts = useSelector(getAllContacts);
   const dispatch = useDispatch();
   const handleClick = (contact) => {
-    console.log("selectedContact =" + contact.id + " - " + contact.name)
     dispatch(selectedContact(contact))
   }
 
@@ -16,8 +15,8 @@ const ContactComponent = () => {
     const { id, name, firstName, number } = contact;
     
     return (
-        <Link to={`/contacts/${id}`} onClick={(e)=> handleClick(contact)}>
-        <div className="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4">
+        <Link key={contact.id} to={`/contact/${id}`} onClick={(e)=> handleClick(contact)}>
+        <div  className="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-lg flex items-center space-x-4">
   <div className="shrink-0">
   </div>
   <div>
@@ -31,4 +30,4 @@ const ContactComponent = () => {
   return <>{renderList}</>;
 };
 
-export default ContactComponent;
+export default ContactsComponent;

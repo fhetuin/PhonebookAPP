@@ -9,3 +9,11 @@ exports.onCreateWebpackConfig = ({ actions }) => {
   });
 }
 
+exports.createPages = async ({ graphql, actions }) => {
+
+    actions.createPage({ 
+      path: '/contact/',
+      matchPath: '/contact/:id',
+      component: path.resolve('./src/templates/contact-details.js'),
+  })
+};

@@ -1,14 +1,29 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import phonebookApi from '../../common/apis/phonebookApi';
 
+
 export const fetchAsyncContacts = createAsyncThunk('contacts/fetchAsyncContacts', async () => {
   const response = await phonebookApi
   .get("Contact");
 
-  console.log("Contacts :", response.data);
   return response.data;
 });
 
+export const createAsyncContact = createAsyncThunk('contacts/createAsyncContact', async ({firstName, name, number}) => {
+  const contact = {firstName, name, number};
+  const response = await phonebookApi
+  .post("Contact", contact);
+
+  return response.data;
+});
+
+export const updateAsyncContact = createAsyncThunk('contacts/updateAsyncContact', async ({id, firstName, name, number}) => {
+  const contact = {id, firstName, name, number};
+  const response = await phonebookApi
+  .put("Contact/"+ contact.id.toString(), contact)
+
+  return response.data;
+});
 
 
 
@@ -28,16 +43,37 @@ export const contactSlice = createSlice({
   },
   extraReducers: {
     [fetchAsyncContacts.pending]: () => {
-      console.log("Pending...");
+      return "Pending...";
     },
     [fetchAsyncContacts.fulfilled]: (state, action) => {
       console.log("Fetched contacts successfully !")
       return {...state, contacts: action.payload }
     },
     [fetchAsyncContacts.rejected]: () => {
-      console.log("Rejected !")
-    }
-    
+      return "Rejected";
+    },
+    [updateAsyncContact.pending]: () => {
+      return "Pending...";
+    },
+    [updateAsyncContact.fulfilled]: (state) => {
+      console.log("Update product successfully !")
+      return {...state};
+      
+    },
+    [updateAsyncContact.rejected]: () => {
+      return "Rejected";
+    },
+    [createAsyncContact.pending]: () => {
+      console.log("Pending...");
+    },
+    [createAsyncContact.fulfilled]: () => {
+      console.log("created contact successfully !")
+
+    },
+    [createAsyncContact.rejected]: () => {
+      console.log("Pending...");
+
+    }   
   }
 });
 
@@ -50,4 +86,4 @@ export const getAllContacts = (state) => state.contacts.contacts;
 export const getSelectedContact = (state) => state.contacts.selectedContact;
 
 // Actions
-export const { setContacts, removeContact, selectedContact } = contactSlice.actions
+export const { setContacts, selectedContact } = contactSlice.actions
